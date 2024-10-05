@@ -1,0 +1,21 @@
+[package]
+name = "cotyledon"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.89"
+askama = { version = "0.12.1", features = ["with-axum"] }
+askama_axum = "0.4.0"
+axum = "0.7.7"
+axum-login = "0.16.0"
+axum-messages = "0.7.0"
+figment = { version = "0.10.19", features = ["toml", "env"] }
+fomat-macros = "0.3.2"
+password-auth = "1.0.0"
+serde = { version = "1.0.210", features = ["derive"] }
+sqlx = "0.8.2"
+thiserror = "1.0.64"
+tokio = { version = "1.40.0", features = ["rt-multi-thread", "signal"] }
+tower-sessions = { version = "0.13.0", features = ["signed"] }
+tower-sessions-sqlx-store = { version = "0.14.1", features = ["sqlite"] }
