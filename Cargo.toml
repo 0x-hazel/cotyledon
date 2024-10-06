@@ -19,3 +19,4 @@ thiserror = "1.0.64"
 tokio = { version = "1.40.0", features = ["rt-multi-thread", "signal"] }
 tower-sessions = { version = "0.13.0", features = ["signed"] }
 tower-sessions-sqlx-store = { version = "0.14.1", features = ["sqlite"] }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }

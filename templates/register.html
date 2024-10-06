@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Register</title>
+        <style>
+            label {
+                display: block;
+                margin-bottom: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <ul>
+            {% for message in messages %}
+            <li>
+                <span><strong>{{ message }}</strong></span>
+            </li>
+            {% endfor %}
+        </ul>
+        <form method="post">
+            <fieldset>
+                <legend>User Registration</legend>
+                <p>
+                    <label for="email">Email</label>
+                    <input name="email" id="email" type="email" />
+                </p>
+                <p>
+                    <label for="username">Username</label>
+                    <input name="username" id="username" />
+                </p>
+                <p>
+                    <label for="password">Password</label>
+                    <input name="password" id="password" type="password" />
+                </p>
+            </fieldset>
+            <input type="submit" value="register" />
+            {% if let Some(next) = next %}
+            <input type="hidden" name="next" value="{{next}}" />
+            {% endif %}
+        </form>
+    </body>
+</html>

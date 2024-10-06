@@ -77,7 +77,9 @@ impl Backend {
             .fetch_optional(&self.db)
             .await?;
         match existing {
-            Some(_) => Ok(None),
+            Some(_) => {
+                Ok(None)
+            },
             None => {
                 let password_hash = generate_hash(&credentials.password);
                 sqlx::query("INSERT INTO users (username, email, password) VALUES ($1, $2, $3);")
