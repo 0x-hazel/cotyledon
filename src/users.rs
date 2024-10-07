@@ -10,7 +10,9 @@ use tokio::task;
 pub struct User {
     id: i64,
     pub username: String,
+    email: String,
     password: String,
+    pub bio: String,
 }
 
 impl AuthUser for User {

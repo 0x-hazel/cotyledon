@@ -10,6 +10,7 @@ use crate::users::AuthSession;
 struct ProtectedTemplate<'a> {
     messages: Vec<Message>,
     username: &'a str,
+    bio: &'a str,
 }
 
 pub fn router() -> Router<()> {
@@ -17,14 +18,14 @@ pub fn router() -> Router<()> {
 }
 
 mod get {
-
-
     use super::*;
+
     pub async fn protected(auth_session: AuthSession, messages: Messages) -> impl IntoResponse {
         match auth_session.user {
             Some(user) => ProtectedTemplate {
                 messages: messages.into_iter().collect(),
                 username: &user.username,
+                bio: &user.bio
             }.into_response(),
             None => StatusCode::INTERNAL_SERVER_ERROR.into_response()
         }
