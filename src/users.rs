@@ -76,18 +76,23 @@ impl Backend {
             .bind(&credentials.email)
             .fetch_optional(&self.db)
             .await?;
+        println!("Existing: {}", existing.is_some());
         match existing {
             Some(_) => {
+                println!("Account exists");
                 Ok(None)
             },
             None => {
                 let password_hash = generate_hash(&credentials.password);
+                println!("Account doesn't exist: {}", password_hash);
                 sqlx::query("INSERT INTO users (username, email, password) VALUES ($1, $2, $3);")
                     .bind(&credentials.username)
                     .bind(&credentials.email)
                     .bind(password_hash)
-                    .execute(&self.db)
+                    .fetch_optional(&self.db)
+                    //.execute(&self.db)
                     .await?;
+                println!("Account created");
                 Ok(Some(LoginCredentials::from(credentials)))
             }
         }

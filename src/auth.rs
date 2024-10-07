@@ -2,7 +2,7 @@ use askama::Template;
 use askama_axum::IntoResponse;
 use axum::{extract::Query, http::StatusCode, response::Redirect, routing::{get, post}, Form, Router};
 use axum_messages::{Message, Messages};
-use fomat_macros::{fomat, pintln};
+use fomat_macros::fomat;
 use serde::Deserialize;
 
 use crate::users::{AuthSession, LoginCredentials};
@@ -52,7 +52,6 @@ async fn _login(mut auth_session: AuthSession, messages: Messages, creds: LoginC
     if auth_session.login(&user).await.is_err() {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
-    pintln!("Login credentials processed successfully");
     messages.success(fomat!("Successfully logged in as "(user.username)));
     if let Some(ref next) = creds.next {
         return Ok(Redirect::to(next));
@@ -91,7 +90,6 @@ mod post {
                 return StatusCode::INTERNAL_SERVER_ERROR.into_response()
             },
         };
-        pintln!("Registration credentials acquired successfully");
         messages.clone().success(fomat!("Registered user "(&credentials.username)));
         match _login(auth_session, messages, creds).await {
             Ok(r) => r.into_response(),

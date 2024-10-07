@@ -10,7 +10,7 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Config {
-            database_url: String::from("sqlite::memory:"),
+            database_url: String::from("sqlite:test.db"),
         }
     }
 }
