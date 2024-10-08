@@ -7,6 +7,7 @@ mod app;
 mod users;
 mod protected;
 mod auth;
+mod public;
 
 #[tokio::main]
 async fn main() -> Result<()> {

@@ -1,3 +1,4 @@
+use anyhow::Result;
 use axum::async_trait;
 use axum_login::{AuthUser, AuthnBackend, UserId};
 use password_auth::{generate_hash, verify_password};
@@ -8,7 +9,7 @@ use tokio::task;
 
 #[derive(Clone, Debug, Deserialize, FromRow, Serialize)]
 pub struct User {
-    id: i64,
+    pub id: i64,
     pub username: String,
     email: String,
     password: String,
@@ -52,26 +53,22 @@ pub struct RegisterCredentials {
     pub next: Option<String>,
 }
 
+#[derive(Debug, Deserialize, FromRow, Serialize)]
+pub struct Post {
+    pub created: String,
+    pub body: String,
+}
+
 #[derive(Clone, Debug)]
 pub struct Backend {
-    db: AnyPool
+    pub db: AnyPool
 }
 
 impl Backend {
     pub fn new(db: AnyPool) -> Self {
         Self { db }
     }
-}
 
-#[derive(Debug, Error)]
-pub enum Error {
-    #[error(transparent)]
-    Sqlx(#[from] sqlx::Error),
-    #[error(transparent)]
-    TaskJoin(#[from] task::JoinError)
-}
-
-impl Backend {
     pub async fn register(&self, credentials: &RegisterCredentials) -> Result<Option<LoginCredentials>, Error> {
         let existing = sqlx::query("SELECT * FROM users WHERE username = $1 OR email = $2")
             .bind(&credentials.username)
@@ -91,14 +88,40 @@ impl Backend {
                     .bind(&credentials.username)
                     .bind(&credentials.email)
                     .bind(password_hash)
-                    .fetch_optional(&self.db)
-                    //.execute(&self.db)
+                    .execute(&self.db)
                     .await?;
                 println!("Account created");
                 Ok(Some(LoginCredentials::from(credentials)))
             }
         }
     }
+
+    pub async fn get_user(&self, username: &str) -> Result<Option<User>> {
+        let user: Option<User> = sqlx::query_as("SELECT * FROM users WHERE username = $1")
+            .bind(username)
+            .fetch_optional(&self.db)
+            .await?;
+        match user {
+            Some(u) => Ok(Some(u)),
+            None => Ok(None)
+        }
+    }
+
+    pub async fn get_posts(&self, user_id: i64) -> Result<Vec<Post>> {
+        let posts: Vec<Post> = sqlx::query_as("SELECT * FROM posts WHERE user_id = $1 ORDER BY created DESC LIMIT 50")
+            .bind(user_id)
+            .fetch_all(&self.db)
+            .await?;
+        Ok(posts)
+    }
+}
+
+#[derive(Debug, Error)]
+pub enum Error {
+    #[error(transparent)]
+    Sqlx(#[from] sqlx::Error),
+    #[error(transparent)]
+    TaskJoin(#[from] task::JoinError)
 }
 
 #[async_trait]
@@ -108,7 +131,7 @@ impl AuthnBackend for Backend {
     type Error = Error;
 
     async fn authenticate(&self, credentials: Self::Credentials) -> Result<Option<Self::User>, Self::Error> {
-        let user: Option<Self::User> = sqlx::query_as("SELECT * FROM users WHERE username = ?")
+        let user: Option<Self::User> = sqlx::query_as("SELECT * FROM users WHERE username = $1")
             .bind(credentials.username)
             .fetch_optional(&self.db)
             .await?;
@@ -118,7 +141,7 @@ impl AuthnBackend for Backend {
     }
 
     async fn get_user(&self, user_id: &UserId<Self>) -> Result<Option<Self::User>, Self::Error> {
-        let user = sqlx::query_as("SELECT * FROM users WHERE id = ?")
+        let user = sqlx::query_as("SELECT * FROM users WHERE id = $1")
             .bind(user_id)
             .fetch_optional(&self.db)
             .await?;

@@ -6,7 +6,7 @@ use tokio::{signal, task::AbortHandle};
 use tower_sessions::{cookie::{time::Duration, Key}, Expiry, SessionManagerLayer};
 use tower_sessions_sqlx_store::SqliteStore;
 
-use crate::{auth, config::Config, protected, users::Backend};
+use crate::{auth, config::Config, protected, public, users::Backend};
 
 pub struct App {
     db: AnyPool,
@@ -40,6 +40,7 @@ impl App {
         let app = protected::router()
             .route_layer(login_required!(Backend, login_url = "/login"))
             .merge(auth::router())
+            .merge(public::router())
             .layer(MessagesManagerLayer)
             .layer(auth_layer);
 

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>New Post</title>
+    </head>
+    <body>
+        <ul>
+            {% for message in messages %}
+            <li>
+                <span><strong>{{ message }}</strong></span>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <p>Posting as {{user.username}}</p>
+        <form method="post">
+            <fieldset>
+                <legend>Compose</legend>
+                <label for="body" hidden>Post contents</label>
+                <textarea name="body" id="body"></textarea>
+            </fieldset>
+            <input type="submit" value="Post!" />
+        </form>
+    </body>
+</html>

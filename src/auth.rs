@@ -7,7 +7,6 @@ use serde::Deserialize;
 
 use crate::users::{AuthSession, LoginCredentials};
 
-
 #[derive(Template)]
 #[template(path = "login.html")]
 pub struct LoginTemplate {
