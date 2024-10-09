@@ -1,32 +1,13 @@
-use askama::Template;
 use askama_axum::IntoResponse;
 use axum::{http::StatusCode, response::Redirect, routing::{get, post}, Form, Router};
-use axum_messages::{Message, Messages};
-use serde::Deserialize;
+use axum_messages::Messages;
 
-use crate::users::{AuthSession, User};
+use crate::param::PostDetails;
+use crate::template::{ProtectedTemplate, PostTemplate};
+use crate::users::AuthSession;
 
-#[derive(Template)]
-#[template(path = "protected.html")]
-struct ProtectedTemplate<'a> {
-    messages: Vec<Message>,
-    username: &'a str,
-    bio: &'a str,
-}
 
-#[derive(Clone, Deserialize)]
-struct PostDetails {
-    body: String,
-}
-
-#[derive(Template)]
-#[template(path = "post.html")]
-struct PostTemplate {
-    messages: Vec<Message>,
-    user: User,
-}
-
-pub fn router() -> Router<()> {
+pub fn router() -> Router {
     Router::new()
         .route("/", get(self::get::home))
         .route("/post", get(self::get::post))
@@ -40,8 +21,7 @@ mod get {
         match auth_session.user {
             Some(user) => ProtectedTemplate {
                 messages: messages.into_iter().collect(),
-                username: &user.username,
-                bio: &user.bio
+                user,
             }.into_response(),
             None => StatusCode::INTERNAL_SERVER_ERROR.into_response()
         }

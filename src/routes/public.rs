@@ -1,24 +1,15 @@
-use askama::Template;
 use askama_axum::IntoResponse;
-use axum::{extract::Path, routing::get, Router};
+use axum::{extract::Path, http::StatusCode, routing::get, Router};
 
-use crate::users::{AuthSession, Post, User};
+use crate::template::UserTemplate;
+use crate::users::AuthSession;
 
-#[derive(Template)]
-#[template(path = "user.html")]
-struct UserTemplate {
-    user: User,
-    posts: Vec<Post>,
-}
-
-pub fn router() -> Router<()> {
+pub fn router() -> Router {
     Router::new()
         .route("/user/:name", get(self::get::user))
 }
 
 mod get {
-    use axum::http::StatusCode;
-
     use super::*;
 
     pub async fn user(auth_session: AuthSession, Path(name): Path<String>) -> impl IntoResponse {

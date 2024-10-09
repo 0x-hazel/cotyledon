@@ -5,9 +5,10 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 mod config;
 mod app;
 mod users;
-mod protected;
-mod auth;
-mod public;
+mod routes;
+mod model;
+mod param;
+mod template;
 
 #[tokio::main]
 async fn main() -> Result<()> {

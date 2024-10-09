@@ -1,32 +1,14 @@
-use askama::Template;
 use askama_axum::IntoResponse;
 use axum::{extract::Query, http::StatusCode, response::Redirect, routing::{get, post}, Form, Router};
-use axum_messages::{Message, Messages};
+use axum_messages::Messages;
 use fomat_macros::fomat;
-use serde::Deserialize;
 
-use crate::users::{AuthSession, LoginCredentials};
+use crate::param::{LoginCredentials, NextUrl, RegisterCredentials};
+use crate::template::{LoginTemplate, RegisterTemplate};
+use crate::users::AuthSession;
 
-#[derive(Template)]
-#[template(path = "login.html")]
-pub struct LoginTemplate {
-    messages: Vec<Message>,
-        next: Option<String>,
-}
 
-#[derive(Template)]
-#[template(path = "register.html")]
-pub struct RegisterTemplate {
-    messages: Vec<Message>,
-    next: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct NextUrl {
-    next: Option<String>,
-}
-
-pub fn router() -> Router<()> {
+pub fn router() -> Router {
     Router::new()
         .route("/register", post(self::post::register))
         .route("/register", get(self::get::register))
@@ -60,10 +42,6 @@ async fn _login(mut auth_session: AuthSession, messages: Messages, creds: LoginC
 }
 
 mod post {
-    use fomat_macros::pintln;
-
-    use crate::users::RegisterCredentials;
-
     use super::*;
 
     pub async fn login(auth_session: AuthSession, messages: Messages, Form(credentials): Form<LoginCredentials>) -> impl IntoResponse {
@@ -85,7 +63,7 @@ mod post {
                 return Redirect::to(&register_url).into_response();
             },
             Err(e) => {
-                pintln!([e]);
+                println!("{:?}", e);
                 return StatusCode::INTERNAL_SERVER_ERROR.into_response()
             },
         };

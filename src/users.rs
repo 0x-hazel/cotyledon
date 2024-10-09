@@ -2,19 +2,11 @@ use anyhow::Result;
 use axum::async_trait;
 use axum_login::{AuthUser, AuthnBackend, UserId};
 use password_auth::{generate_hash, verify_password};
-use serde::{Deserialize, Serialize};
-use sqlx::{prelude::FromRow, AnyPool};
+use sqlx::AnyPool;
 use thiserror::Error;
 use tokio::task;
 
-#[derive(Clone, Debug, Deserialize, FromRow, Serialize)]
-pub struct User {
-    pub id: i64,
-    pub username: String,
-    email: String,
-    password: String,
-    pub bio: String,
-}
+use crate::{model::{Post, User}, param::{LoginCredentials, RegisterCredentials}};
 
 impl AuthUser for User {
     type Id = i64;
@@ -26,37 +18,6 @@ impl AuthUser for User {
     fn session_auth_hash(&self) -> &[u8] {
         self.password.as_bytes()
     }
-}
-
-#[derive(Clone, Deserialize)]
-pub struct LoginCredentials {
-    pub username: String, 
-    pub password: String,
-    pub next: Option<String>,
-}
-
-impl LoginCredentials {
-    pub fn from(creds: &RegisterCredentials) -> Self {
-        LoginCredentials {
-            username: creds.username.clone(),
-            password: creds.password.clone(),
-            next: creds.next.clone(),
-        }
-    }
-}
-
-#[derive(Clone, Deserialize)]
-pub struct RegisterCredentials {
-    pub email: String,
-    pub username: String,
-    pub password: String,
-    pub next: Option<String>,
-}
-
-#[derive(Debug, Deserialize, FromRow, Serialize)]
-pub struct Post {
-    pub created: String,
-    pub body: String,
 }
 
 #[derive(Clone, Debug)]

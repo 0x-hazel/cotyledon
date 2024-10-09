@@ -12,8 +12,8 @@
             {% endfor %}
         </ul>
 
-        <p>Logged in as <a href="/user/{{username}}">{{username}}</a></p>
-        <p>{{bio}}</p>
+        <p>Logged in as <a href="/user/{{user.username}}">{{user.username}}</a></p>
+        <p>{{user.bio}}</p>
         <a href="/post">Compose</a>
         <a href="/logout">Log Out</a>
     </body>
