@@ -39,6 +39,8 @@ pub struct PostTemplate {
 #[derive(Template)]
 #[template(path = "user.html")]
 pub struct UserTemplate {
+    pub logged_in: bool,
+    pub following: bool,
     pub user: DisplayUser,
     pub posts: Vec<Thread>,
 }

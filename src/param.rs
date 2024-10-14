@@ -34,3 +34,9 @@ pub struct NextUrl {
 pub struct PostDetails {
     pub body: String,
 }
+
+#[derive(Clone, Deserialize)]
+pub struct FollowDetails {
+    pub name: String,
+    pub id: i64,
+}

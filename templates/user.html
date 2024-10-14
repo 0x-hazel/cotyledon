@@ -6,6 +6,14 @@
     <body>
         <h1>{{user.username}}</h1>
         <p>{{user.bio}}</p>
+        {% if logged_in && !following %}
+        <form method="post" action="/follow">
+            <input type="hidden" name="name" value="{{user.username}}"
+            <input type="hidden" name="id" value="{{user.id}}" />
+            <input type="submit" value="Follow" />
+        </form>
+        {% endif %}
+        <hr/>
         {% for post in posts %}
             {% include "post_fragment.html" %}
         {% endfor %}

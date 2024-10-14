@@ -2,7 +2,7 @@ use askama_axum::IntoResponse;
 use axum::{http::StatusCode, response::Redirect, routing::{get, post}, Form, Router};
 use axum_messages::Messages;
 
-use crate::param::PostDetails;
+use crate::param::{FollowDetails, PostDetails};
 use crate::template::{DashTemplate, PostTemplate};
 use crate::authentication::AuthSession;
 
@@ -12,6 +12,7 @@ pub fn router() -> Router {
         .route("/dash", get(self::get::home))
         .route("/post", get(self::get::post))
         .route("/post", post(self::post::post))
+        .route("/follow", post(self::post::follow))
 }
 
 mod get {
@@ -69,6 +70,22 @@ mod post {
                 Redirect::to("/dash").into_response()
             },
             None => StatusCode::INTERNAL_SERVER_ERROR.into_response()
+        }
+    }
+
+    pub async fn follow(auth_session: AuthSession, Form(follow): Form<FollowDetails>) -> impl IntoResponse {
+        match auth_session.user {
+            Some(user) => {
+                match sqlx::query("INSERT INTO follows (follower, followee, is_accepted) VALUES ($1, $2, 1)")
+                    .bind(user.id)
+                    .bind(follow.id)
+                    .execute(&auth_session.backend.db)
+                    .await {
+                        Ok(_) => Redirect::to(&format!("/user/{}", follow.name)).into_response(),
+                        Err(_) => StatusCode::INTERNAL_SERVER_ERROR.into_response()
+                }
+            },
+            None => StatusCode::UNAUTHORIZED.into_response()
         }
     }
 }

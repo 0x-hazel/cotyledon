@@ -30,6 +30,17 @@ impl AuthUser {
                 .await?
         )
     }
+
+    pub async fn is_following(&self, name: String, db: &AnyPool) -> bool {
+        match sqlx::query("SELECT follower FROM follows WHERE follower = $1 AND followee = (SELECT id FROM users WHERE username = $2)")
+            .bind(self.id)
+            .bind(name)
+            .fetch_optional(db)
+            .await {
+            Ok(o) => o.is_some(),
+            Err(_) => false
+        }
+    }
 }
 
 impl Debug for AuthUser {

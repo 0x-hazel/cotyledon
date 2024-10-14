@@ -33,6 +33,11 @@ mod get {
                         Ok(posts) => {
                             let posts: Vec<Thread> = join_all(posts.into_iter().map(|x| x.into(&auth_session.backend.db))).await.into_iter().map(|x|x.unwrap()).collect();
                             UserTemplate {
+                                logged_in: auth_session.user.is_some(),
+                                following: match auth_session.user {
+                                    Some(u) => u.is_following(name, &auth_session.backend.db).await,
+                                    None => false,
+                                },
                                 user: u,
                                 posts,
                             }.into_response()
