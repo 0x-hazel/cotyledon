@@ -1,7 +1,11 @@
 use askama::Template;
 use axum_messages::Message;
 
-use crate::model::{Post, User};
+use crate::model::{DisplayUser, Thread};
+
+#[derive(Template)]
+#[template(path = "home.html")]
+pub struct HomeTemplate;
 
 #[derive(Template)]
 #[template(path = "login.html")]
@@ -18,22 +22,23 @@ pub struct RegisterTemplate {
 }
 
 #[derive(Template)]
-#[template(path = "protected.html")]
-pub struct ProtectedTemplate {
+#[template(path = "dash.html")]
+pub struct DashTemplate {
     pub messages: Vec<Message>,
-    pub user: User,
+    pub user: DisplayUser,
+    pub posts: Vec<Thread>,
 }
 
 #[derive(Template)]
 #[template(path = "post.html")]
 pub struct PostTemplate {
     pub messages: Vec<Message>,
-    pub user: User,
+    pub user: DisplayUser,
 }
 
 #[derive(Template)]
 #[template(path = "user.html")]
 pub struct UserTemplate {
-    pub user: User,
-    pub posts: Vec<Post>,
+    pub user: DisplayUser,
+    pub posts: Vec<Thread>,
 }

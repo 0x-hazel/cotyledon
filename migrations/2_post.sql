@@ -2,9 +2,9 @@ CREATE TABLE IF NOT EXISTS posts
 (
     id integer PRIMARY KEY NOT NULL,
     user_id integer,
-    responding integer,
+    thread text,
     created text NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    summary text,
     body text NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
-    FOREIGN KEY (responding) REFERENCES posts (id)
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
 );

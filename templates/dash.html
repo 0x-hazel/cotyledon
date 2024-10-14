@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Protected</title>
+        <title>Dashboard</title>
     </head>
     <body>
         <ul>
@@ -16,5 +16,17 @@
         <p>{{user.bio}}</p>
         <a href="/post">Compose</a>
         <a href="/logout">Log Out</a>
+        <hr />
+        <ul>
+            {% for thread in posts %}
+                <li>{{thread.timestamp}}</li>
+                {% for post in thread.contents %}
+                    <p>{{post.body}}</p>
+                {% endfor %}
+                {% for tag in thread.tags %}
+                    <p>#{{tag}}</p>
+                {% endfor %}
+            {% endfor %}
+        </ul>
     </body>
 </html>

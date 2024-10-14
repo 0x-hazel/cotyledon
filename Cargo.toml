@@ -12,6 +12,7 @@ axum-login = "0.16.0"
 axum-messages = "0.7.0"
 figment = { version = "0.10.19", features = ["toml", "env"] }
 fomat-macros = "0.3.2"
+futures = "0.3.31"
 password-auth = "1.0.0"
 serde = { version = "1.0.210", features = ["derive"] }
 sqlx = "0.8.2"

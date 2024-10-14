@@ -5,7 +5,7 @@ use fomat_macros::fomat;
 
 use crate::param::{LoginCredentials, NextUrl, RegisterCredentials};
 use crate::template::{LoginTemplate, RegisterTemplate};
-use crate::users::AuthSession;
+use crate::authentication::AuthSession;
 
 
 pub fn router() -> Router {
@@ -37,7 +37,7 @@ async fn _login(mut auth_session: AuthSession, messages: Messages, creds: LoginC
     if let Some(ref next) = creds.next {
         return Ok(Redirect::to(next));
     } else {
-        return Ok(Redirect::to("/"));
+        return Ok(Redirect::to("/dash"));
     }
 }
 
@@ -94,7 +94,7 @@ mod get {
 
     pub async fn logout(mut auth_session: AuthSession) -> impl IntoResponse {
         match auth_session.logout().await {
-            Ok(_) => Redirect::to("/login").into_response(),
+            Ok(_) => Redirect::to("/").into_response(),
             Err(_) => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
         }
     }

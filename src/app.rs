@@ -6,7 +6,7 @@ use tokio::{signal, task::AbortHandle};
 use tower_sessions::{cookie::{time::Duration, Key}, Expiry, SessionManagerLayer};
 use tower_sessions_sqlx_store::SqliteStore;
 
-use crate::{config::Config, routes::{auth, protected, public}, users::Backend};
+use crate::{config::Config, routes::{auth, protected, public}, authentication::Backend};
 
 pub struct App {
     db: AnyPool,

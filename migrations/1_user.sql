@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS users
 (
     id integer PRIMARY KEY NOT NULL,
     username text NOT NULL UNIQUE,
+    display_name text NOT NULL DEFAULT '',
     email text NOT NULL UNIQUE,
     password text NOT NULL,
     bio text NOT NULL DEFAULT ''

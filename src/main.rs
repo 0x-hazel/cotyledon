@@ -4,7 +4,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 
 mod config;
 mod app;
-mod users;
+mod authentication;
 mod routes;
 mod model;
 mod param;

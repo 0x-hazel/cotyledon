@@ -6,7 +6,7 @@ use sqlx::AnyPool;
 use thiserror::Error;
 use tokio::task;
 
-use crate::{model::{Post, User}, param::{LoginCredentials, RegisterCredentials}};
+use crate::{model::{AuthUser as User, DisplayUser, RawPost, Thread}, param::{LoginCredentials, RegisterCredentials}};
 
 impl AuthUser for User {
     type Id = i64;
@@ -57,8 +57,8 @@ impl Backend {
         }
     }
 
-    pub async fn get_user(&self, username: &str) -> Result<Option<User>> {
-        let user: Option<User> = sqlx::query_as("SELECT * FROM users WHERE username = $1")
+    pub async fn get_user(&self, username: &str) -> Result<Option<DisplayUser>> {
+        let user: Option<DisplayUser> = sqlx::query_as("SELECT id, username, display_name, bio FROM users WHERE username = $1")
             .bind(username)
             .fetch_optional(&self.db)
             .await?;
@@ -68,12 +68,27 @@ impl Backend {
         }
     }
 
-    pub async fn get_posts(&self, user_id: i64) -> Result<Vec<Post>> {
-        let posts: Vec<Post> = sqlx::query_as("SELECT * FROM posts WHERE user_id = $1 ORDER BY created DESC LIMIT 50")
+    pub async fn get_posts(&self, user_id: i64) -> Result<Vec<RawPost>> {
+        let posts: Vec<RawPost> = sqlx::query_as("SELECT * FROM posts WHERE user_id = $1 ORDER BY created DESC LIMIT 50")
             .bind(user_id)
             .fetch_all(&self.db)
             .await?;
         Ok(posts)
+    }
+
+    pub async fn get_dash_contents(&self, user_id: i64) -> Result<Vec<Thread>> {
+        let mut result = Vec::new();
+        let follows: Vec<DisplayUser> = sqlx::query_as("SELECT id, username, display_name, bio FROM users INNER JOIN follows ON follows.followee = users.id WHERE follows.follower = $1")
+            .bind(user_id)
+            .fetch_all(&self.db)
+            .await?;
+        for follow in follows {
+            let posts = self.get_posts(follow.id).await?;
+            for post in posts {
+                result.push(post.into(&self.db).await?);
+            }
+        }
+        Ok(result)
     }
 }
 
