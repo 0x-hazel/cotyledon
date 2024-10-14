@@ -69,7 +69,7 @@ impl Backend {
     }
 
     pub async fn get_posts(&self, user_id: i64) -> Result<Vec<RawPost>> {
-        let posts: Vec<RawPost> = sqlx::query_as("SELECT * FROM posts WHERE user_id = $1 ORDER BY created DESC LIMIT 50")
+        let posts: Vec<RawPost> = sqlx::query_as("SELECT posts.id, users.username, thread, created, summary, body FROM posts INNER JOIN users ON posts.user_id = users.id WHERE user_id = $1 ORDER BY created DESC LIMIT 50")
             .bind(user_id)
             .fetch_all(&self.db)
             .await?;

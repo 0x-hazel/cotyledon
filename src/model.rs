@@ -54,6 +54,7 @@ pub struct DisplayUser {
 #[derive(Debug, Deserialize, FromRow, Serialize)]
 pub struct RawPost {
     pub id: i64,
+    pub username: String,
     pub thread: Option<String>,
     pub created: String,
     pub summary: Option<String>,
@@ -72,12 +73,14 @@ impl RawPost {
                     acc.to_mut().push_str(&s);
                     acc
                 }).unwrap_or_default();
-                let query = format!("SELECT created, summary, body FROM posts WHERE id IN ({})", args);
+                let query = format!("SELECT posts.id, users.username, created, summary, body FROM posts INNER JOIN ON post.user_id = user.id WHERE post.id IN ({})", args);
                 println!("Querying: {}", query);
                 let mut result = sqlx::query_as(&query)
                     .fetch_all(db)
                     .await?;
                 result.push(Post {
+                    id: self.id,
+                    username: self.username.clone(),
                     created: self.created.clone(),
                     summary: self.summary,
                     body: self.body
@@ -85,6 +88,8 @@ impl RawPost {
                 result
             },
             None => vec![Post {
+                id: self.id,
+                username: self.username.clone(),
                 created: self.created.clone(),
                 summary: self.summary,
                 body: self.body
@@ -96,7 +101,8 @@ impl RawPost {
             .await?;
         Ok(
             Thread {
-                timestamp: self.created,
+                username: self.username,
+                created: self.created,
                 contents,
                 tags: tags.into_iter().map(|x| x.0).collect()
             }
@@ -106,6 +112,8 @@ impl RawPost {
 
 #[derive(Debug, Deserialize, FromRow, Serialize)]
 pub struct Post {
+    pub id: i64,
+    pub username: String,
     pub created: String,
     pub summary: Option<String>,
     pub body: String,
@@ -113,7 +121,8 @@ pub struct Post {
 
 #[derive(Debug, Deserialize, FromRow, Serialize)]
 pub struct Thread {
-    pub timestamp: String,
+    pub username: String,
+    pub created: String,
     pub contents: Vec<Post>,
     pub tags: Vec<String>,
 }

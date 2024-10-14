@@ -17,16 +17,8 @@
         <a href="/post">Compose</a>
         <a href="/logout">Log Out</a>
         <hr />
-        <ul>
-            {% for thread in posts %}
-                <li>{{thread.timestamp}}</li>
-                {% for post in thread.contents %}
-                    <p>{{post.body}}</p>
-                {% endfor %}
-                {% for tag in thread.tags %}
-                    <p>#{{tag}}</p>
-                {% endfor %}
-            {% endfor %}
-        </ul>
+        {% for post in posts %}
+            {% include "post_fragment.html" %}
+        {% endfor %}
     </body>
 </html>

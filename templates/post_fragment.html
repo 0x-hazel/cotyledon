@@ -1,0 +1,15 @@
+<div style="border:1px solid gray;border-radius:.5em;padding:.5em;margin-bottom:1em;width:30em">
+{% if post.contents.len() > 1 %}
+<span style="font-weight:bold">{{post.username}}</span> <span style="float:right">{{post.created}}</span>
+<hr/>
+{% endif %}
+{% for node in post.contents %}
+<span style="font-weight:bold">{{node.username}}</span><span style="float:right">{{node.created}}</span>
+<hr/>
+{{node.body}}
+<hr/>
+{% endfor %}
+{% for tag in post.tags %}
+<span style="color:gray;margin-right:.5em">#{{tag}}</span>
+{% endfor %}
+</div>
