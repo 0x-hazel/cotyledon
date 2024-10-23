@@ -13,12 +13,21 @@
         </ul>
 
         <p>Posting as {{user.username}}</p>
+        <hr />
+        {% if responding.is_some() %}
+        <p>Responding to:</p>
+        {% let post = responding.as_ref().unwrap() %}
+        {% include "post_fragment_responding.html" %}
+        {% endif %}
         <form method="post">
             <fieldset>
                 <legend>Compose</legend>
+                <label for="summary" hidden>Post Summary</label>
+                <input type="text" name="summary" id="summary" placeholder="Post summary (hides contents)" />
                 <label for="body" hidden>Post contents</label>
                 <textarea name="body" id="body"></textarea>
             </fieldset>
+            <input type="hidden" name="responding" id="responding" value="{{responding_id}}" />
             <input type="submit" value="Post!" />
         </form>
     </body>

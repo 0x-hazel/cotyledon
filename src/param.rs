@@ -30,13 +30,20 @@ pub struct NextUrl {
     pub next: Option<String>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct PostDetails {
+    pub summary: String,
     pub body: String,
+    pub responding: Option<i64>,
 }
 
 #[derive(Clone, Deserialize)]
 pub struct FollowDetails {
     pub name: String,
     pub id: i64,
+}
+
+#[derive(Deserialize)]
+pub struct PostComposeDetails {
+    pub responding: Option<i64>,
 }

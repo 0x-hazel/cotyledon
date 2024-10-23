@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use axum::async_trait;
 use axum_login::{AuthUser, AuthnBackend, UserId};
 use password_auth::{generate_hash, verify_password};
@@ -76,6 +76,28 @@ impl Backend {
         Ok(posts)
     }
 
+    pub async fn get_post(&self, post_id: i64) -> Result<Thread> {
+        let post: Option<RawPost> = sqlx::query_as("SELECT posts.id, users.username, thread, created, summary, body FROM posts INNER JOIN users ON posts.user_id = users.id WHERE posts.id = $1")
+            .bind(post_id)
+            .fetch_optional(&self.db)
+            .await?;
+        match post {
+            Some(p) => Ok(p.convert(&self.db).await?),
+            None => Err(anyhow!("No such post"))
+        }
+    }
+    
+    pub async fn get_raw_post(&self, post_id: i64) -> Result<RawPost> {
+        let post: Option<RawPost> = sqlx::query_as("SELECT posts.id, users.username, thread, created, summary, body FROM posts INNER JOIN users ON posts.user_id = users.id WHERE posts.id = $1")
+            .bind(post_id)
+            .fetch_optional(&self.db)
+            .await?;
+        match post {
+            Some(p) => Ok(p),
+            None => Err(anyhow!("No such post"))
+        }
+    }
+
     pub async fn get_dash_contents(&self, user_id: i64) -> Result<Vec<Thread>> {
         let mut result = Vec::new();
         let follows: Vec<DisplayUser> = sqlx::query_as("SELECT id, username, display_name, bio FROM users INNER JOIN follows ON follows.followee = users.id WHERE follows.follower = $1")
@@ -83,11 +105,12 @@ impl Backend {
             .fetch_all(&self.db)
             .await?;
         for follow in follows {
-            let posts = self.get_posts(follow.id).await?;
+            let posts = self.get_posts(follow.id).await?;            
             for post in posts {
-                result.push(post.into(&self.db).await?);
+                result.push(post.convert(&self.db).await?);
             }
         }
+        result.sort_by(|a, b| b.created.cmp(&a.created));
         Ok(result)
     }
 }

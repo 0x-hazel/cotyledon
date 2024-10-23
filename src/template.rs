@@ -33,6 +33,8 @@ pub struct DashTemplate {
 #[template(path = "post.html")]
 pub struct PostTemplate {
     pub messages: Vec<Message>,
+    pub responding_id: i64,
+    pub responding: Option<Thread>,
     pub user: DisplayUser,
 }
 

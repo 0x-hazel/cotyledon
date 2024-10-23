@@ -18,11 +18,7 @@
 {% endif %}
 <hr/>
 {% endfor %}
-{% if post.tags.len() > 0 %}
 {% for tag in post.tags %}
 <span style="color:gray;margin-right:.5em">#{{tag}}</span>
 {% endfor %}
-<hr />
-{% endif %}
-<a href="/post?responding={{post.id}}"><button>Respond</button></a>
 </div>

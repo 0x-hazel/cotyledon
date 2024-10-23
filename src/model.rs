@@ -73,7 +73,7 @@ pub struct RawPost {
 }
 
 impl RawPost {
-    pub async fn into(self, db: &AnyPool) -> Result<Thread> {
+    pub async fn convert(self, db: &AnyPool) -> Result<Thread> {
         let contents = match self.thread {
             Some(t) => {
                 // Rather hacky here, but should work fine as long as thread data is properly sanitised
@@ -84,8 +84,7 @@ impl RawPost {
                     acc.to_mut().push_str(&s);
                     acc
                 }).unwrap_or_default();
-                let query = format!("SELECT posts.id, users.username, created, summary, body FROM posts INNER JOIN ON post.user_id = user.id WHERE post.id IN ({})", args);
-                println!("Querying: {}", query);
+                let query = format!("SELECT posts.id, users.username, created, summary, body FROM posts INNER JOIN users ON posts.user_id = users.id WHERE posts.id IN ({})", args);
                 let mut result = sqlx::query_as(&query)
                     .fetch_all(db)
                     .await?;
@@ -112,6 +111,7 @@ impl RawPost {
             .await?;
         Ok(
             Thread {
+                id: self.id,
                 username: self.username,
                 created: self.created,
                 contents,
@@ -132,6 +132,7 @@ pub struct Post {
 
 #[derive(Debug, Deserialize, FromRow, Serialize)]
 pub struct Thread {
+    pub id: i64,
     pub username: String,
     pub created: String,
     pub contents: Vec<Post>,
